@@ -26,6 +26,12 @@ module TableFor
 
     def column(*args, &block)
       options = args.extract_options!
+      if global_options[:can_for].present? and options[:can_skip].blank?
+        return nil if global_options[:records].blank?
+        table_record = global_options[:records].first
+        attribute = options[:can_attribute].presence || args.first
+        return nil unless global_options[:can_for].can? :index, table_record, attribute
+      end
       queue(*args, options, &block)
       if options[:link_url] ||
          options[:link_action] ||
